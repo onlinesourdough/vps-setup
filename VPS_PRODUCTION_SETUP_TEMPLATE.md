@@ -139,6 +139,20 @@ su - <admin_user>
 sudo whoami
 ```
 
+### 2.1b Optional: passwordless sudo for the admin user
+
+If an automation agent or tooling needs to run privileged commands over SSH non-interactively, allow the admin user to sudo without a password:
+
+```bash
+echo '<admin_user> ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/<admin_user>-nopasswd
+chmod 440 /etc/sudoers.d/<admin_user>-nopasswd
+visudo -c
+```
+
+`visudo -c` must report `parsed OK`. Always use a drop-in file in `/etc/sudoers.d/` — a syntax error in the main sudoers file can lock you out of sudo entirely.
+
+Trade-off, stated honestly: with key-only SSH, the sudo password only protects against escalation by someone who already has your SSH key or an open session. Removing the prompt makes the SSH private key the key to everything — acceptable for a single-admin server if the private key is passphrase-protected and stored safely; reconsider on multi-user machines.
+
 ### 2.2 Add SSH key for the admin user
 
 ```bash
@@ -185,6 +199,19 @@ If root access must be kept temporarily for recovery, use key-only root access:
 ```conf
 PermitRootLogin without-password
 ```
+
+If a deployment runtime (e.g. Coolify) manages the host via SSH as root from its docker network, keep root blocked from the internet but allow it key-only from that network:
+
+```conf
+PermitRootLogin no
+AllowUsers <admin_user>
+
+Match Address <runtime_network>,127.0.0.1,::1
+    PermitRootLogin prohibit-password
+    AllowUsers <admin_user> root
+```
+
+Find the runtime's source network by checking accepted logins: `journalctl -u ssh | grep "Accepted publickey for root"`. Verify the runtime still works afterwards (e.g. trigger a deployment or test its SSH path directly).
 
 Validate and reload:
 
@@ -235,6 +262,8 @@ Create `/etc/fail2ban/jail.local`:
 bantime  = 1h
 findtime = 10m
 maxretry = 4
+# Never ban: localhost, deployment runtime docker network, VPN/Tailscale range
+ignoreip = 127.0.0.1/8 ::1 <runtime_network> 100.64.0.0/10
 
 [sshd]
 enabled = true
