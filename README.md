@@ -26,3 +26,10 @@ Works with any VPS provider (Hetzner, DigitalOcean, Vultr, AWS Lightsail, ...). 
 - The cloud firewall is the primary perimeter on Docker hosts — UFW does not protect published container ports.
 - Backups are not done until a restore has been tested.
 - Snapshot before every risky change.
+
+## License
+
+Original code and documentation are available under the [MIT License](LICENSE).
+Third-party code, fonts, copied reference material, and other third-party assets
+retain their own licenses and attribution. Brand names, logos, portraits, and
+editorial media are not licensed for reuse by this software license.
