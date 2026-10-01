@@ -1,6 +1,8 @@
 # VPS Production Setup Template
 
-Reusable, provider-neutral checklist for setting up and hardening a production VPS — from first `ssh root@<server_ip>` to a monitored, backed-up, production-ready server.
+Set up a VPS with a recovery path, secure access, monitoring and tested
+backups. The [checklist](VPS_PRODUCTION_SETUP_TEMPLATE.md) takes you from first
+access through deployment and ongoing operation.
 
 Works with any VPS provider (Hetzner, DigitalOcean, Vultr, AWS Lightsail, ...). The only provider-specific concept used is a cloud/perimeter firewall and a web recovery console, which all major providers offer.
 
